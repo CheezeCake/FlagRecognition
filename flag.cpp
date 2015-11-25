@@ -42,6 +42,7 @@ bool Flag::numericAttribute(Attribute attr)
 			case TRIANGLE:
 			case ICON:
 			case ANIMATE:
+			case TEXT:
 				return true;
 			default:
 				return false;

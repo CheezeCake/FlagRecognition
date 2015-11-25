@@ -32,8 +32,8 @@ class Flag
 			TRIANGLE,
 			ICON,
 			ANIMATE,
-			// string
 			TEXT,
+			// string
 			TOP_LEFT,
 			BOT_RIGHT
 		};
