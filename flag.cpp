@@ -23,28 +23,28 @@ int Flag::getAttribute(Attribute attr) const
 bool Flag::numericAttribute(Attribute attr)
 {
 	switch (attr) {
-			case BARS:
-			case STRIPES:
-			case COLOURS:
-			case RED_PRESENT:
-			case GREEN_PRESENT:
-			case BLUE_PRESENT:
-			case GOLD_PRESENT:
-			case WHITE_PRESENT:
-			case BLACK_PRESENT:
-			case ORANGE_PRESENT:
-			case CIRCLES:
-			case CROSSES:
-			case SALTIRES:
-			case QUARTERS:
-			case SUNSTARS:
-			case CRESENT:
-			case TRIANGLE:
-			case ICON:
-			case ANIMATE:
-			case TEXT:
-				return true;
-			default:
-				return false;
+		case BARS:
+		case STRIPES:
+		case COLOURS:
+		case RED_PRESENT:
+		case GREEN_PRESENT:
+		case BLUE_PRESENT:
+		case GOLD_PRESENT:
+		case WHITE_PRESENT:
+		case BLACK_PRESENT:
+		case ORANGE_PRESENT:
+		case CIRCLES:
+		case CROSSES:
+		case SALTIRES:
+		case QUARTERS:
+		case SUNSTARS:
+		case CRESENT:
+		case TRIANGLE:
+		case ICON:
+		case ANIMATE:
+		case TEXT:
+			return true;
+		default:
+			return false;
 	}
 }
