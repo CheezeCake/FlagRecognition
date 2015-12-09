@@ -3,5 +3,6 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 flagRecognition
-snippet.cpp
 *.swp
+*.jpg
+*.png
