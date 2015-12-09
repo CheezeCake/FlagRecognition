@@ -13,8 +13,11 @@ class FlagRecognizer
 		std::string recognize(const cv::Mat& src);
 
 		int extractBars(const cv::Mat& src) const;
+		int extractStripes(const cv::Mat& src) const;
+		int extractColours(const cv::Mat& src) const;
 
 	private:
+		static constexpr double degreesToRadians(double angle);
 		void loadDataSet(const std::string& filename);
 		std::vector<Flag> flags;
 

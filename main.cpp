@@ -1,6 +1,7 @@
 #include <iostream>
 #include <opencv/cv.hpp>
 #include "flagRecognizer.hpp"
+#include "colors.hpp"
 
 int main(int argc, char** argv)
 {

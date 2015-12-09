@@ -1,14 +1,18 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <set>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "flagRecognizer.hpp"
+#include "colors.hpp"
 
 using namespace std::placeholders;
 
 FlagRecognizer::FlagRecognizer(const std::string& filename)
 {
 	attributeExtractionFunctions[Flag::Attribute::BARS] = std::bind(&FlagRecognizer::extractBars, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::STRIPES] = std::bind(&FlagRecognizer::extractStripes, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::COLOURS] = std::bind(&FlagRecognizer::extractColours, this, _1);
 
 	loadDataSet(filename);
 }
@@ -27,6 +31,8 @@ std::string FlagRecognizer::recognize(const cv::Mat& src)
 
 int FlagRecognizer::extractBars(const cv::Mat& src) const
 {
+	int n = 0;
+
 	cv::Mat grey;
 	cv::cvtColor(src, grey, cv::COLOR_BGR2GRAY);
 
@@ -36,25 +42,59 @@ int FlagRecognizer::extractBars(const cv::Mat& src) const
 	std::vector<cv::Vec2f> lines;
 	cv::HoughLines(edges, lines, 1, CV_PI/180, 120, 0, 0);
 
-	std::cout << lines.size() << '\n';
+	for (size_t i = 0; i < lines.size(); i++)
+	{
+		float theta = lines[i][1];
+
+		// TODO: check line size?
+		if (theta < degreesToRadians(10) || theta > degreesToRadians(170))
+			++n;
+	}
+
+	return ((n == 0) ? 0 : (n + 1));
+}
+
+int FlagRecognizer::extractStripes(const cv::Mat& src) const
+{
+	int n = 0;
+
+	cv::Mat grey;
+	cv::cvtColor(src, grey, cv::COLOR_BGR2GRAY);
+
+	cv::Mat edges;
+	cv::Canny(grey, edges, 50, 150);
+
+	std::vector<cv::Vec2f> lines;
+	cv::HoughLines(edges, lines, 1, CV_PI/180, 120, 0, 0);
 
 	for (size_t i = 0; i < lines.size(); i++)
 	{
-		float rho = lines[i][0], theta = lines[i][1];
-		cv::Point pt1, pt2;
-		double a = cos(theta), b = sin(theta);
-		double x0 = a*rho, y0 = b*rho;
-		pt1.x = cvRound(x0 + 1000*(-b));
-		pt1.y = cvRound(y0 + 1000*(a));
-		pt2.x = cvRound(x0 - 1000*(-b));
-		pt2.y = cvRound(y0 - 1000*(a));
-		line(src, pt1, pt2, cv::Scalar(0, 255, 0), 3, CV_AA);
+		float theta = lines[i][1];
+
+		// TODO: check line size?
+		if (theta > degreesToRadians(80) && theta < degreesToRadians(100))
+			++n;
 	}
 
-	cv::imshow(__func__, src);
-	cv::waitKey();
+	return ((n == 0) ? 0 : (n + 1));
+}
 
-	return 0;
+int FlagRecognizer::extractColours(const cv::Mat& src) const
+{
+	cv::Mat hsv;
+	cvtColor(src, hsv, cv::COLOR_BGR2HSV);
+
+	std::set<int> colorCodeSet;
+
+	typedef cv::Point3_<uint8_t> Pixel;
+
+	int n = 0;
+	std::set<uint32_t> colorSet;
+
+	for (Pixel& p : cv::Mat_<Pixel>(hsv))
+		colorCodeSet.insert(Colors::getColorCode(p.x, p.y, p.z));
+
+	return colorCodeSet.size();
 }
 
 void FlagRecognizer::loadDataSet(const std::string& filename)
@@ -90,4 +130,9 @@ void FlagRecognizer::loadDataSet(const std::string& filename)
 			flags.push_back(flag);
 		}
 	}
+}
+
+constexpr double FlagRecognizer::degreesToRadians(double angle)
+{
+	return ((CV_PI / 180) * angle);
 }
