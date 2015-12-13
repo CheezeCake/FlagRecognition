@@ -8,11 +8,20 @@
 
 using namespace std::placeholders;
 
+typedef cv::Point3_<uint8_t> Pixel;
+
 FlagRecognizer::FlagRecognizer(const std::string& filename)
 {
 	attributeExtractionFunctions[Flag::Attribute::BARS] = std::bind(&FlagRecognizer::extractBars, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::STRIPES] = std::bind(&FlagRecognizer::extractStripes, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::COLOURS] = std::bind(&FlagRecognizer::extractColours, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::RED_PRESENT] = std::bind(&FlagRecognizer::extractRedPresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::GREEN_PRESENT] = std::bind(&FlagRecognizer::extractGreenPresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::BLUE_PRESENT] = std::bind(&FlagRecognizer::extractBluePresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::GOLD_PRESENT] = std::bind(&FlagRecognizer::extractGoldPresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::WHITE_PRESENT] = std::bind(&FlagRecognizer::extractWhitePresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::BLACK_PRESENT] = std::bind(&FlagRecognizer::extractBlackPresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::ORANGE_PRESENT] = std::bind(&FlagRecognizer::extractOrangePresent, this, _1);
 
 	loadDataSet(filename);
 }
@@ -22,8 +31,10 @@ std::string FlagRecognizer::recognize(const cv::Mat& src)
 	std::array<int, Flag::AttributeCount> srcAttributes;
 
 	for (int i = 0; i < Flag::AttributeCount; i++) {
-		if (attributeExtractionFunctions[i])
+		if (attributeExtractionFunctions[i]) {
 			srcAttributes[i] = attributeExtractionFunctions[i](src);
+			std::cout << Flag::getAttributeName(static_cast<Flag::Attribute>(i)) << " : " << srcAttributes[i] << '\n';
+		}
 	}
 
 	return std::string();
@@ -42,8 +53,7 @@ int FlagRecognizer::extractBars(const cv::Mat& src) const
 	std::vector<cv::Vec2f> lines;
 	cv::HoughLines(edges, lines, 1, CV_PI/180, 120, 0, 0);
 
-	for (size_t i = 0; i < lines.size(); i++)
-	{
+	for (size_t i = 0; i < lines.size(); i++) {
 		float theta = lines[i][1];
 
 		// TODO: check line size?
@@ -67,8 +77,7 @@ int FlagRecognizer::extractStripes(const cv::Mat& src) const
 	std::vector<cv::Vec2f> lines;
 	cv::HoughLines(edges, lines, 1, CV_PI/180, 120, 0, 0);
 
-	for (size_t i = 0; i < lines.size(); i++)
-	{
+	for (size_t i = 0; i < lines.size(); i++) {
 		float theta = lines[i][1];
 
 		// TODO: check line size?
@@ -82,19 +91,71 @@ int FlagRecognizer::extractStripes(const cv::Mat& src) const
 int FlagRecognizer::extractColours(const cv::Mat& src) const
 {
 	cv::Mat hsv;
-	cvtColor(src, hsv, cv::COLOR_BGR2HSV);
+	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
 	std::set<int> colorCodeSet;
-
-	typedef cv::Point3_<uint8_t> Pixel;
 
 	int n = 0;
 	std::set<uint32_t> colorSet;
 
-	for (Pixel& p : cv::Mat_<Pixel>(hsv))
-		colorCodeSet.insert(Colors::getColorCode(p.x, p.y, p.z));
+	for (Pixel& p : cv::Mat_<Pixel>(hsv)) {
+		int colorCode = Colors::getColorCode(p.x, p.y, p.z);
+		if (colorCode != -1)
+			colorCodeSet.insert(colorCode);
+	}
 
 	return colorCodeSet.size();
+}
+
+bool FlagRecognizer::colorPresent(const cv::Mat& src, Colors::Color color) const
+{
+	/* unsigned int n = 0; */
+	cv::Mat hsv;
+	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
+
+	for (Pixel& p : cv::Mat_<Pixel>(hsv)) {
+		if (Colors::getColorCode(p.x, p.y, p.z) == color)
+			/* ++n; */
+			return true;
+	}
+
+	/* return (n >= (hsv.cols * hsv.rows) / 100); */
+	return false;
+}
+
+int FlagRecognizer::extractRedPresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::RED);
+}
+
+int FlagRecognizer::extractGreenPresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::GREEN);
+}
+
+int FlagRecognizer::extractBluePresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::BLUE);
+}
+
+int FlagRecognizer::extractGoldPresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::GOLD);
+}
+
+int FlagRecognizer::extractWhitePresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::WHITE);
+}
+
+int FlagRecognizer::extractBlackPresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::BLACK);
+}
+
+int FlagRecognizer::extractOrangePresent(const cv::Mat& src) const
+{
+	return colorPresent(src, Colors::Color::ORANGE);
 }
 
 void FlagRecognizer::loadDataSet(const std::string& filename)
