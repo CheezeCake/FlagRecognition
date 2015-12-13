@@ -13,7 +13,7 @@ class Colors
 			RED,
 			GREEN,
 			BLUE,
-			GOLD,
+			GOLD, // also yellow
 			WHITE,
 			BLACK,
 			ORANGE
