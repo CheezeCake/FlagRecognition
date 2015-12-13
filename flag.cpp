@@ -3,6 +3,32 @@
 #include <cassert>
 #include "flag.hpp"
 
+const std::array<const std::string, Flag::AttributeCount> Flag::AttributeName = {
+	"BARS",
+	"STRIPES",
+	"COLOURS",
+	"RED_PRESENT",
+	"GREEN_PRESENT",
+	"BLUE_PRESENT",
+	"GOLD_PRESENT",
+	"WHITE_PRESENT",
+	"BLACK_PRESENT",
+	"ORANGE_PRESENT",
+	"MAIN_HUE",
+	"CIRCLES",
+	"CROSSES",
+	"SALTIRES",
+	"QUARTERS",
+	"SUNSTARS",
+	"CRESENT",
+	"TRIANGLE",
+	"ICON",
+	"ANIMATE",
+	"TEXT",
+	"TOP_LEFT",
+	"BOT_RIGHT"
+};
+
 Flag::Flag(const std::string& countryName)
 	: name(countryName)
 {
@@ -47,4 +73,10 @@ bool Flag::numericAttribute(Attribute attr)
 		default:
 			return false;
 	}
+}
+
+std::string Flag::getAttributeName(Attribute attr)
+{
+	assert(attr >= 0 && attr < AttributeCount);
+	return AttributeName[attr];
 }

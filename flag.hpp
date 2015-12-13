@@ -45,8 +45,11 @@ class Flag
 		int getAttribute(Attribute attr) const;
 
 		static bool numericAttribute(Attribute attr);
+		static std::string getAttributeName(Attribute attr);
 
 	private:
 		std::string name;
 		std::array<int, AttributeCount> attributes;
+
+		static const std::array<const std::string, Flag::AttributeCount> AttributeName;
 };
