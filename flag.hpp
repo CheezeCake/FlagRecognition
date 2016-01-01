@@ -41,6 +41,7 @@ class Flag
 		static constexpr int AttributeCount = BOT_RIGHT + 1;
 
 		Flag(const std::string& countryName);
+		std::string getName();
 		void setAttribute(Attribute attr, int value);
 		int getAttribute(Attribute attr) const;
 

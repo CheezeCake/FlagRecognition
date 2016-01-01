@@ -12,6 +12,7 @@ class FlagRecognizer
 	public:
 		explicit FlagRecognizer(const std::string& filename);
 		std::string recognize(const cv::Mat& src);
+		std::string findCountry(const std::array<int, Flag::AttributeCount>& srcAttributes);
 
 		int extractBars(const cv::Mat& src) const;
 		int extractStripes(const cv::Mat& src) const;

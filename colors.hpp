@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <map>
 #include <tuple>
 
 
@@ -20,7 +22,9 @@ class Colors
 		};
 
 		static int getColorCode(uint8_t h, uint8_t s, uint8_t v);
+		static int getColorCode(const std::string& color);
 
 	private:
 		static const std::tuple<Range, Range, Range> colorRanges[Colors::ORANGE + 1];
+		static const std::map<std::string, Color> colorCodes;
 };

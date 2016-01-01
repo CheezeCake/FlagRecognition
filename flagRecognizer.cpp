@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <set>
+#include <map>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "flagRecognizer.hpp"
 #include "colors.hpp"
@@ -37,6 +38,31 @@ std::string FlagRecognizer::recognize(const cv::Mat& src)
 		}
 	}
 
+	findCountry(srcAttributes);
+
+	return std::string();
+}
+
+std::string FlagRecognizer::findCountry(const std::array<int, Flag::AttributeCount>& srcAttributes)
+{
+	std::map<int, std::string> result;
+	for (Flag f : flags) {
+		int n = 0;
+		for (int i = 0; i < Flag::AttributeCount; i++) {
+			if (attributeExtractionFunctions[i]) {
+				int attr = f.getAttribute(static_cast<Flag::Attribute>(i));
+				if (attr == srcAttributes[i])
+					++n;
+			}
+		}
+
+		result.emplace(n, f.getName());
+	}
+
+	for (const auto& it : result) {
+		std::cout << it.first << ", " << it.second << '\n';
+	}
+
 	return std::string();
 }
 
@@ -57,7 +83,8 @@ int FlagRecognizer::extractBars(const cv::Mat& src) const
 		float theta = lines[i][1];
 
 		// TODO: check line size?
-		if (theta < degreesToRadians(10) || theta > degreesToRadians(170))
+		if ((theta < degreesToRadians(10) || theta > degreesToRadians(170)) &&
+				lines[i][0] > src.rows / 2)
 			++n;
 	}
 
@@ -81,8 +108,10 @@ int FlagRecognizer::extractStripes(const cv::Mat& src) const
 		float theta = lines[i][1];
 
 		// TODO: check line size?
-		if (theta > degreesToRadians(80) && theta < degreesToRadians(100))
+		if (theta > degreesToRadians(80) && theta < degreesToRadians(100) &&
+				lines[i][0] > src.cols / 2.5) {
 			++n;
+		}
 	}
 
 	return ((n == 0) ? 0 : (n + 1));
@@ -109,18 +138,16 @@ int FlagRecognizer::extractColours(const cv::Mat& src) const
 
 bool FlagRecognizer::colorPresent(const cv::Mat& src, Colors::Color color) const
 {
-	/* unsigned int n = 0; */
+	unsigned int n = 0;
 	cv::Mat hsv;
 	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
 	for (Pixel& p : cv::Mat_<Pixel>(hsv)) {
 		if (Colors::getColorCode(p.x, p.y, p.z) == color)
-			/* ++n; */
-			return true;
+			++n;
 	}
 
-	/* return (n >= (hsv.cols * hsv.rows) / 100); */
-	return false;
+	return (n >= 5 * ((hsv.cols * hsv.rows) / 100));
 }
 
 int FlagRecognizer::extractRedPresent(const cv::Mat& src) const
@@ -185,11 +212,11 @@ void FlagRecognizer::loadDataSet(const std::string& filename)
 			Flag::Attribute attribute = static_cast<Flag::Attribute>(i);
 			if (Flag::numericAttribute(attribute))
 				flag.setAttribute(attribute, std::stoi(s));
-			/* else */
-			/* 	flag.setAttribute(attribute, getColorCode(s)); */
-
-			flags.push_back(flag);
+			else
+				flag.setAttribute(attribute, Colors::getColorCode(s));
 		}
+
+		flags.push_back(flag);
 	}
 }
 

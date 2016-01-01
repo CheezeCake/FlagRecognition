@@ -34,6 +34,11 @@ Flag::Flag(const std::string& countryName)
 {
 }
 
+std::string Flag::getName()
+{
+	return name;
+}
+
 void Flag::setAttribute(Attribute attr, int value)
 {
 	assert(attr >= 0 && attr < AttributeCount);
