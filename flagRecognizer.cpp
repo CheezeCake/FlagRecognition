@@ -23,6 +23,7 @@ FlagRecognizer::FlagRecognizer(const std::string& filename)
 	attributeExtractionFunctions[Flag::Attribute::WHITE_PRESENT] = std::bind(&FlagRecognizer::extractWhitePresent, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::BLACK_PRESENT] = std::bind(&FlagRecognizer::extractBlackPresent, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::ORANGE_PRESENT] = std::bind(&FlagRecognizer::extractOrangePresent, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::CIRCLES] = std::bind(&FlagRecognizer::extractCircles, this, _1);
 
 	loadDataSet(filename);
 }
@@ -134,6 +135,17 @@ int FlagRecognizer::extractColours(const cv::Mat& src) const
 	}
 
 	return colorCodeSet.size();
+}
+
+int FlagRecognizer::extractCircles(const cv::Mat& src) const
+{
+	cv::Mat gray;
+	std::vector<cv::Vec3f> circles;
+	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+	gray.convertTo(gray, CV_8U);
+	cv::GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
+	cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, gray.rows/4, 200, 100);
+	return circles.size();
 }
 
 bool FlagRecognizer::colorPresent(const cv::Mat& src, Colors::Color color) const
