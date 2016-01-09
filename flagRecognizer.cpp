@@ -207,7 +207,7 @@ bool FlagRecognizer::isCircle(cv::Vec3f circle, const cv::Mat& src) const
 	printf("LEFT : %d\n", Colors::getColorCode(left.x, left.y, left.z));
 	printf("RIGHT : %d\n", Colors::getColorCode(right.x, right.y, right.z));
 
-	if(Colors::getColorCode(top.x, top.y, top.z) == Colors::getColorCode(bottom.x, bottom.y, bottom.z) 
+	if(Colors::getColorCode(top.x, top.y, top.z) == Colors::getColorCode(bottom.x, bottom.y, bottom.z)
 			&& Colors::getColorCode(left.x, left.y, left.z) == Colors::getColorCode(right.x, right.y, right.z))
 		return true;
 
