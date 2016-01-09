@@ -24,6 +24,7 @@ FlagRecognizer::FlagRecognizer(const std::string& filename)
 	attributeExtractionFunctions[Flag::Attribute::BLACK_PRESENT] = std::bind(&FlagRecognizer::extractBlackPresent, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::ORANGE_PRESENT] = std::bind(&FlagRecognizer::extractOrangePresent, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::CIRCLES] = std::bind(&FlagRecognizer::extractCircles, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::TRIANGLE] = std::bind(&FlagRecognizer::extractTriangle, this, _1);
 
 	loadDataSet(filename);
 }
@@ -65,6 +66,34 @@ std::string FlagRecognizer::findCountry(const std::array<int, Flag::AttributeCou
 	}
 
 	return std::string();
+}
+
+int FlagRecognizer::extractTriangle(const cv::Mat& src) const
+{
+	cv::Mat gray;
+	cv::cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+
+	cv::Mat bw;
+	cv::Canny(gray, bw, 255, 2500, 5);
+
+	std::vector<std::vector<cv::Point>> contours;
+	cv::findContours(bw.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+	std::vector<cv::Point> approx;
+
+	for (int i = 0; i < contours.size(); i++) {
+		cv::approxPolyDP(cv::Mat(contours[i]), approx,
+				cv::arcLength(cv::Mat(contours[i]), true) * 0.02, true);
+
+		// Skip small or non-convex objects
+		 if (std::fabs(cv::contourArea(contours[i])) < 100 || !cv::isContourConvex(approx))
+			 continue;
+
+		 if (approx.size() == 3)
+			 return true;
+	}
+
+	return false;
 }
 
 int FlagRecognizer::extractBars(const cv::Mat& src) const

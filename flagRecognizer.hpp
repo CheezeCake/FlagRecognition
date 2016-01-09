@@ -25,6 +25,7 @@ class FlagRecognizer
 		int extractBlackPresent(const cv::Mat& src) const;
 		int extractOrangePresent(const cv::Mat& src) const;
 		int extractCircles(const cv::Mat& src) const;
+		int extractTriangle(const cv::Mat& src) const;
 
 	private:
 		static constexpr double degreesToRadians(double angle);
