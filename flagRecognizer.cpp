@@ -61,8 +61,14 @@ std::string FlagRecognizer::findCountry(const std::array<int, Flag::AttributeCou
 		result.emplace(n, f.getName());
 	}
 
-	for (const auto& it : result) {
-		std::cout << it.first << ", " << it.second << '\n';
+	if (!result.empty()) {
+		std::cout << "\nmatching attributes | country\n";
+		auto& it = --result.cend();
+		do {
+			std::cout << it->first << " | " << it->second << '\n';
+		} while (it-- != result.cbegin());
+
+		return result.cbegin()->second;
 	}
 
 	return std::string();
