@@ -144,8 +144,45 @@ int FlagRecognizer::extractCircles(const cv::Mat& src) const
 	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
 	gray.convertTo(gray, CV_8U);
 	cv::GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
+	/*cv::namedWindow("FUT", cv::WINDOW_AUTOSIZE);
+	cv::imshow("FUT", gray);
+	cv::waitKey(0);*/
 	cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, gray.rows/4, 200, 100);
-	return circles.size();
+
+	unsigned int count = 0;
+
+	for(cv::Vec3f circle : circles)
+		if(isCircle(circle, src))
+			count++;
+
+	return count;
+}
+
+bool FlagRecognizer::isCircle(cv::Vec3f circle, const cv::Mat& src) const
+{
+	cv::Mat hsv;
+	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
+
+	const int ORIGIN_X = 0;
+	const int ORIGIN_Y = 1;
+	const int RADIUS = 2;
+
+	Pixel top = hsv.at<Pixel>(circle[0], circle[1] - circle[2]);
+	Pixel bottom = hsv.at<Pixel>(circle[0], circle[1] + circle[2]);
+	Pixel left = hsv.at<Pixel>(circle[0] - circle[2], circle[1]);
+	Pixel right = hsv.at<Pixel>(circle[0] + circle[2], circle[1]);
+
+
+	printf("TOP : %d\n", Colors::getColorCode(top.x, top.y, top.z));
+	printf("BOTTOM: %d\n", Colors::getColorCode(bottom.x, bottom.y, bottom.z));
+	printf("LEFT : %d\n", Colors::getColorCode(left.x, left.y, left.z));
+	printf("RIGHT : %d\n", Colors::getColorCode(right.x, right.y, right.z));
+
+	if(Colors::getColorCode(top.x, top.y, top.z) == Colors::getColorCode(bottom.x, bottom.y, bottom.z) 
+			&& Colors::getColorCode(left.x, left.y, left.z) == Colors::getColorCode(right.x, right.y, right.z))
+		return true;
+
+	return false;
 }
 
 bool FlagRecognizer::colorPresent(const cv::Mat& src, Colors::Color color) const

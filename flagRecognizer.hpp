@@ -30,6 +30,7 @@ class FlagRecognizer
 		static constexpr double degreesToRadians(double angle);
 		void loadDataSet(const std::string& filename);
 		bool colorPresent(const cv::Mat& src, Colors::Color color) const;
+		bool isCircle(cv::Vec3f, const cv::Mat& src) const;
 
 		std::vector<Flag> flags;
 
