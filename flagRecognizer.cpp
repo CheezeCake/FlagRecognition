@@ -263,10 +263,10 @@ bool FlagRecognizer::isCircleOrCrescent(cv::Vec3f circle, const cv::Mat& src, bo
 	//	originalCircle = true;
 		return true;
 
-	//else if( 
-	else if(!circleNotCrescent && 
+	//else if(
+	else if(!circleNotCrescent &&
 			((top_color == bottom_color && top_color == left_color && top_color != right_color)
-			 || (top_color != bottom_color && top_color == left_color && top_color == right_color) 
+			 || (top_color != bottom_color && top_color == left_color && top_color == right_color)
 			 || (top_color == bottom_color && top_color != left_color && top_color == right_color)
 			 || (top_color != bottom_color && bottom_color == left_color && bottom_color != right_color)))
 		//originalCrescent = true;
@@ -275,13 +275,13 @@ bool FlagRecognizer::isCircleOrCrescent(cv::Vec3f circle, const cv::Mat& src, bo
 	/*if(top_color2 == bottom_color2 && left_color2 == right_color2 && top_color2 == left_color2)
 		rotatedCircle = true;
 
-	else if( 
+	else if(
 			((top_color2 == bottom_color2 && top_color2 == left_color2 && top_color2 != right_color2)
-			 || (top_color2 != bottom_color2 && top_color2 == left_color2 && top_color2 == right_color2) 
+			 || (top_color2 != bottom_color2 && top_color2 == left_color2 && top_color2 == right_color2)
 			 || (top_color2 == bottom_color2 && top_color2 != left_color2 && top_color2 == right_color2)
 			 || (top_color2 != bottom_color2 && bottom_color2 == left_color2 && bottom_color2 != right_color2)))
 		rotatedCrescent = true;*/
-		
+
 	/*if(circleNotCrescent && originalCircle && rotatedCircle)
 		return true;
 
