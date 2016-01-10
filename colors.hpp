@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <tuple>
+#include <vector>
 
 
 class Colors
@@ -25,6 +26,6 @@ class Colors
 		static int getColorCode(const std::string& color);
 
 	private:
-		static const std::tuple<Range, Range, Range> colorRanges[Colors::ORANGE + 1];
+		static const std::vector<std::tuple<Range, Range, Range>> colorRanges[Colors::ORANGE + 1];
 		static const std::map<std::string, Color> colorCodes;
 };
