@@ -26,12 +26,13 @@ class FlagRecognizer
 		int extractOrangePresent(const cv::Mat& src) const;
 		int extractCircles(const cv::Mat& src) const;
 		int extractTriangle(const cv::Mat& src) const;
+		int extractCrescent(const cv::Mat& src) const;
 
 	private:
 		static constexpr double degreesToRadians(double angle);
 		void loadDataSet(const std::string& filename);
 		bool colorPresent(const cv::Mat& src, Colors::Color color) const;
-		bool isCircle(cv::Vec3f, const cv::Mat& src) const;
+		bool isCircleOrCrescent(cv::Vec3f, const cv::Mat& src, bool circleNotCrescent) const;
 
 		std::vector<Flag> flags;
 

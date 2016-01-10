@@ -28,7 +28,7 @@ class Flag
 			QUARTERS,
 			SUNSTARS,
 			// bool
-			CRESENT,
+			CRESCENT,
 			TRIANGLE,
 			ICON,
 			ANIMATE,

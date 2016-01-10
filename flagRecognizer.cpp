@@ -25,6 +25,7 @@ FlagRecognizer::FlagRecognizer(const std::string& filename)
 	attributeExtractionFunctions[Flag::Attribute::ORANGE_PRESENT] = std::bind(&FlagRecognizer::extractOrangePresent, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::CIRCLES] = std::bind(&FlagRecognizer::extractCircles, this, _1);
 	attributeExtractionFunctions[Flag::Attribute::TRIANGLE] = std::bind(&FlagRecognizer::extractTriangle, this, _1);
+	attributeExtractionFunctions[Flag::Attribute::CRESCENT] = std::bind(&FlagRecognizer::extractCrescent, this, _1);
 
 	loadDataSet(filename);
 }
@@ -187,33 +188,67 @@ int FlagRecognizer::extractCircles(const cv::Mat& src) const
 	unsigned int count = 0;
 
 	for(cv::Vec3f circle : circles)
-		if(isCircle(circle, src))
+		if(isCircleOrCrescent(circle, src, true))
 			count++;
 
 	return count;
 }
 
-bool FlagRecognizer::isCircle(cv::Vec3f circle, const cv::Mat& src) const
+int FlagRecognizer::extractCrescent(const cv::Mat& src) const
 {
+	cv::Mat gray;
+	std::vector<cv::Vec3f> circles;
+
+	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+
+	gray.convertTo(gray, CV_8U);
+	cv::GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
+
+	cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, gray.rows/4, 200, 100);
+
+	for(cv::Vec3f circle : circles)
+		if(isCircleOrCrescent(circle, src, false))
+			return 1;
+	return 0;
+}
+
+bool FlagRecognizer::isCircleOrCrescent(cv::Vec3f circle, const cv::Mat& src, bool circleNotCrescent) const
+{
+	const int ORIGIN_X = 0;
+	const int ORIGIN_Y = 1;
+	const int RADIUS = 2;
+
 	cv::Mat hsv;
 	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
 	cv::Mat hsv_channels[3];
 	cv::split(hsv, hsv_channels);
 
-	const int ORIGIN_X = 0;
-	const int ORIGIN_Y = 1;
-	const int RADIUS = 2;
+	/*cv::Mat rotated;
+	cv::Mat rotationMat;
+	cv::Point2f origin(circle[ORIGIN_X], circle[ORIGIN_Y]);
+	rotationMat = cv::getRotationMatrix2D(origin, 35, 1.0);
+	cv::warpAffine(hsv_channels[2], rotated, rotationMat, cv::Size(src.cols, src.rows));*/
 
 	Pixel top = hsv_channels[2].at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] - circle[RADIUS]);
 	Pixel bottom = hsv_channels[2].at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] + circle[RADIUS]);
 	Pixel left = hsv_channels[2].at<Pixel>(circle[ORIGIN_X] - circle[RADIUS], circle[ORIGIN_Y]);
 	Pixel right = hsv_channels[2].at<Pixel>(circle[ORIGIN_X] + circle[RADIUS], circle[ORIGIN_Y]);
 
+	/*Pixel top2 = rotated.at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] - circle[RADIUS]);
+	Pixel bottom2 = rotated.at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] + circle[RADIUS]);
+	Pixel left2 = rotated.at<Pixel>(circle[ORIGIN_X] - circle[RADIUS], circle[ORIGIN_Y]);
+	Pixel right2 = rotated.at<Pixel>(circle[ORIGIN_X] + circle[RADIUS], circle[ORIGIN_Y]);*/
+
 	int top_color = Colors::getColorCode(top.x, top.y, top.z);
 	int bottom_color = Colors::getColorCode(bottom.x, bottom.y, bottom.z);
 	int left_color = Colors::getColorCode(left.x, left.y, left.z);
 	int right_color = Colors::getColorCode(right.x, right.y, right.z);
+
+	/*int top_color2 = Colors::getColorCode(top2.x, top2.y, top2.z);
+	int bottom_color2 = Colors::getColorCode(bottom2.x, bottom2.y, bottom2.z);
+	int left_color2 = Colors::getColorCode(left2.x, left2.y, left2.z);
+	int right_color2 = Colors::getColorCode(right2.x, right2.y, right2.z);*/
 
 
 	/*printf("TOP : %d\n", top_color);
@@ -221,8 +256,42 @@ bool FlagRecognizer::isCircle(cv::Vec3f circle, const cv::Mat& src) const
 	printf("LEFT : %d\n", left_color);
 	printf("RIGHT : %d\n", right_color);*/
 
-	if(top_color == bottom_color && left_color == right_color && top_color == left_color)
+	/*bool originalCircle = false;
+	bool rotatedCircle = false;
+	bool originalCrescent = false;
+	bool rotatedCrescent = false;*/
+
+	if(circleNotCrescent && top_color == bottom_color && left_color == right_color && top_color == left_color)
+	//if(top_color == bottom_color && left_color == right_color && top_color == left_color)
+	//	originalCircle = true;
 		return true;
+
+	//else if( 
+	else if(!circleNotCrescent && 
+			((top_color == bottom_color && top_color == left_color && top_color != right_color)
+			 || (top_color != bottom_color && top_color == left_color && top_color == right_color) 
+			 || (top_color == bottom_color && top_color != left_color && top_color == right_color)
+			 || (top_color != bottom_color && bottom_color == left_color && bottom_color != right_color)))
+		//originalCrescent = true;
+		return true;
+
+	/*if(top_color2 == bottom_color2 && left_color2 == right_color2 && top_color2 == left_color2)
+		rotatedCircle = true;
+
+	else if( 
+			((top_color2 == bottom_color2 && top_color2 == left_color2 && top_color2 != right_color2)
+			 || (top_color2 != bottom_color2 && top_color2 == left_color2 && top_color2 == right_color2) 
+			 || (top_color2 == bottom_color2 && top_color2 != left_color2 && top_color2 == right_color2)
+			 || (top_color2 != bottom_color2 && bottom_color2 == left_color2 && bottom_color2 != right_color2)))
+		rotatedCrescent = true;*/
+		
+	/*if(circleNotCrescent && originalCircle && rotatedCircle)
+		return true;
+
+	if(!circleNotCrescent && ((originalCrescent && rotatedCrescent)
+			|| (originalCrescent && rotatedCircle)
+			|| (originalCircle && rotatedCrescent)))
+		return true;*/
 
 	return false;
 }

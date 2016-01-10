@@ -20,7 +20,7 @@ const std::array<const std::string, Flag::AttributeCount> Flag::AttributeName = 
 	"SALTIRES",
 	"QUARTERS",
 	"SUNSTARS",
-	"CRESENT",
+	"CRESCENT",
 	"TRIANGLE",
 	"ICON",
 	"ANIMATE",
@@ -69,7 +69,7 @@ bool Flag::numericAttribute(Attribute attr)
 		case SALTIRES:
 		case QUARTERS:
 		case SUNSTARS:
-		case CRESENT:
+		case CRESCENT:
 		case TRIANGLE:
 		case ICON:
 		case ANIMATE:
