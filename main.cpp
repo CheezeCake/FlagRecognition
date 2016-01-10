@@ -10,10 +10,19 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	cv::Mat flag = cv::imread(argv[1]);
-	FlagRecognizer recognizer("flag.data");
+	try {
+		cv::Mat flag = cv::imread(argv[1]);
+		FlagRecognizer recognizer("flag.data");
 
-	recognizer.recognize(flag);
+		recognizer.recognize(flag);
+	}
+	catch (const std::exception& e) {
+		std::cerr << e.what() << '\n';
+		return 2;
+	}
+	catch (...) {
+		return 3;
+	}
 
 	return 0;
 }
