@@ -2,7 +2,7 @@
 
 const std::tuple<Colors::Range, Colors::Range, Colors::Range> Colors::colorRanges[] = {
 	[Color::RED] = std::make_tuple(std::make_pair(0, 180), std::make_pair(230, 255), std::make_pair(60, 255)),
-	[Color::GREEN] = std::make_tuple(std::make_pair(38, 75), std::make_pair(150, 255), std::make_pair(60, 255)),
+	[Color::GREEN] = std::make_tuple(std::make_pair(170, 180), std::make_pair(150, 255), std::make_pair(60, 255)),
 	[Color::BLUE] = std::make_tuple(std::make_pair(75, 135), std::make_pair(150, 255), std::make_pair(60, 255)),
 	[Color::GOLD] = std::make_tuple(std::make_pair(22, 38), std::make_pair(150, 255), std::make_pair(60, 255)),
 	[Color::WHITE] = std::make_tuple(std::make_pair(0, 200), std::make_pair(0, 10), std::make_pair(0, 255)),
