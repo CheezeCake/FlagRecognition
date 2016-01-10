@@ -119,9 +119,8 @@ int FlagRecognizer::extractBars(const cv::Mat& src) const
 	for (size_t i = 0; i < lines.size(); i++) {
 		float theta = lines[i][1];
 
-		// TODO: check line size?
-		if ((theta < degreesToRadians(10) || theta > degreesToRadians(170)) &&
-				lines[i][0] > src.rows / 2)
+		if ((theta < degreesToRadians(10) || theta > degreesToRadians(170)))
+			//&& lines[i][0] > src.rows / 2)
 			++n;
 	}
 
@@ -144,11 +143,9 @@ int FlagRecognizer::extractStripes(const cv::Mat& src) const
 	for (size_t i = 0; i < lines.size(); i++) {
 		float theta = lines[i][1];
 
-		// TODO: check line size?
-		if (theta > degreesToRadians(80) && theta < degreesToRadians(100) &&
-				lines[i][0] > src.cols / 2.5) {
+		if (theta > degreesToRadians(80) && theta < degreesToRadians(100))
+			//&& lines[i][0] > src.cols / 2.5)
 			++n;
-		}
 	}
 
 	return ((n == 0) ? 0 : (n + 1));
