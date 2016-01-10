@@ -176,12 +176,12 @@ int FlagRecognizer::extractCircles(const cv::Mat& src) const
 {
 	cv::Mat gray;
 	std::vector<cv::Vec3f> circles;
+
 	cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+
 	gray.convertTo(gray, CV_8U);
 	cv::GaussianBlur(gray, gray, cv::Size(9, 9), 2, 2);
-	/*cv::namedWindow("FUT", cv::WINDOW_AUTOSIZE);
-	cv::imshow("FUT", gray);
-	cv::waitKey(0);*/
+
 	cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, gray.rows/4, 200, 100);
 
 	unsigned int count = 0;
@@ -198,23 +198,30 @@ bool FlagRecognizer::isCircle(cv::Vec3f circle, const cv::Mat& src) const
 	cv::Mat hsv;
 	cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
+	cv::Mat hsv_channels[3];
+	cv::split(hsv, hsv_channels);
+
 	const int ORIGIN_X = 0;
 	const int ORIGIN_Y = 1;
 	const int RADIUS = 2;
 
-	Pixel top = hsv.at<Pixel>(circle[0], circle[1] - circle[2]);
-	Pixel bottom = hsv.at<Pixel>(circle[0], circle[1] + circle[2]);
-	Pixel left = hsv.at<Pixel>(circle[0] - circle[2], circle[1]);
-	Pixel right = hsv.at<Pixel>(circle[0] + circle[2], circle[1]);
+	Pixel top = hsv_channels[2].at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] - circle[RADIUS]);
+	Pixel bottom = hsv_channels[2].at<Pixel>(circle[ORIGIN_X], circle[ORIGIN_Y] + circle[RADIUS]);
+	Pixel left = hsv_channels[2].at<Pixel>(circle[ORIGIN_X] - circle[RADIUS], circle[ORIGIN_Y]);
+	Pixel right = hsv_channels[2].at<Pixel>(circle[ORIGIN_X] + circle[RADIUS], circle[ORIGIN_Y]);
+
+	int top_color = Colors::getColorCode(top.x, top.y, top.z);
+	int bottom_color = Colors::getColorCode(bottom.x, bottom.y, bottom.z);
+	int left_color = Colors::getColorCode(left.x, left.y, left.z);
+	int right_color = Colors::getColorCode(right.x, right.y, right.z);
 
 
-	printf("TOP : %d\n", Colors::getColorCode(top.x, top.y, top.z));
-	printf("BOTTOM: %d\n", Colors::getColorCode(bottom.x, bottom.y, bottom.z));
-	printf("LEFT : %d\n", Colors::getColorCode(left.x, left.y, left.z));
-	printf("RIGHT : %d\n", Colors::getColorCode(right.x, right.y, right.z));
+	/*printf("TOP : %d\n", top_color);
+	printf("BOTTOM: %d\n", bottom_color);
+	printf("LEFT : %d\n", left_color);
+	printf("RIGHT : %d\n", right_color);*/
 
-	if(Colors::getColorCode(top.x, top.y, top.z) == Colors::getColorCode(bottom.x, bottom.y, bottom.z)
-			&& Colors::getColorCode(left.x, left.y, left.z) == Colors::getColorCode(right.x, right.y, right.z))
+	if(top_color == bottom_color && left_color == right_color && top_color == left_color)
 		return true;
 
 	return false;
