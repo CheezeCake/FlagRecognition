@@ -3,17 +3,17 @@
 const std::vector<std::tuple<Colors::Range, Colors::Range, Colors::Range>> Colors::colorRanges[] = {
 	// 2 color ranges for RED
 	[Color::RED] = {
-		std::make_tuple(std::make_pair(0, 5), std::make_pair(200, 255), std::make_pair(100, 255)),
-		std::make_tuple(std::make_pair(169, 179), std::make_pair(200, 255), std::make_pair(100, 255))
+		std::make_tuple(std::make_pair(0, 5), std::make_pair(200, 255), std::make_pair(90, 255)),
+		std::make_tuple(std::make_pair(169, 179), std::make_pair(200, 255), std::make_pair(90, 255))
 	},
 	[Color::GREEN] = {
-		std::make_tuple(std::make_pair(49, 98), std::make_pair(200, 255), std::make_pair(100, 255))
+		std::make_tuple(std::make_pair(49, 98), std::make_pair(200, 255), std::make_pair(90, 255))
 	},
 	[Color::BLUE] = {
-		std::make_tuple(std::make_pair(98, 122), std::make_pair(200, 255), std::make_pair(100, 255))
+		std::make_tuple(std::make_pair(98, 122), std::make_pair(200, 255), std::make_pair(90, 255))
 	},
 	[Color::GOLD] = {
-		std::make_tuple(std::make_pair(20, 33), std::make_pair(200, 255), std::make_pair(100, 255))
+		std::make_tuple(std::make_pair(20, 33), std::make_pair(200, 255), std::make_pair(90, 255))
 	},
 	[Color::WHITE] = {
 		std::make_tuple(std::make_pair(0, 255), std::make_pair(0, 18), std::make_pair(237, 255))
@@ -22,7 +22,7 @@ const std::vector<std::tuple<Colors::Range, Colors::Range, Colors::Range>> Color
 		std::make_tuple(std::make_pair(0, 255), std::make_pair(0, 255), std::make_pair(0, 38))
 	},
 	[Color::ORANGE] = {
-		std::make_tuple(std::make_pair(10, 20), std::make_pair(200, 255), std::make_pair(100, 100))
+		std::make_tuple(std::make_pair(10, 20), std::make_pair(200, 255), std::make_pair(90, 255))
 	}
 };
 
