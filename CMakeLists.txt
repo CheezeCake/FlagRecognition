@@ -4,7 +4,7 @@ project(FlagRecognition)
 
 find_package(OpenCV REQUIRED)
 
-file(GLOB source_files *.cpp)
+file(GLOB source_files src/*.cpp)
 add_executable(flagRecognition ${source_files})
 target_link_libraries(flagRecognition ${OpenCV_LIBS})
 
